@@ -2,108 +2,216 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-
-  <!-- iPhone操作の最重要ポイント -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Band Practice Scheduler</title>
 
-  <title>Band Practice Planner</title>
-
-  <!-- iOSでタップを安定させる -->
   <style>
+    :root {
+      --bg: #111;
+      --panel: #1c1c1c;
+      --accent: #5eead4;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
       margin: 0;
       padding: 16px;
-      background: #111;
-      color: #eee;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    h1 {
-      font-size: 1.4rem;
-      margin-bottom: 12px;
-    }
+    h1 { font-size: 1.4rem; margin-bottom: 12px; letter-spacing: 0.05em; }
+    h2 { font-size: 1.1rem; margin-bottom: 8px; color: var(--accent); }
 
-    .section {
-      margin-bottom: 20px;
-      padding: 12px;
-      background: #1c1c1c;
+    .container { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .panel { background: var(--panel); border-radius: 10px; padding: 12px; }
+
+    .menu-item {
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #262626;
       border-radius: 8px;
-    }
-
-    button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      font-size: 1rem;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
       cursor: pointer;
     }
 
-    button:active {
-      opacity: 0.7;
+    .schedule-item {
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
     }
 
-    ul {
-      padding-left: 20px;
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+
+    input[type="number"] {
+      width: 60px;
+      background: #111;
+      color: var(--text);
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 4px;
     }
 
-    li {
-      margin-bottom: 6px;
+    textarea {
+      width: 100%;
+      min-height: 60px;
+      background: #111;
+      color: var(--text);
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 6px;
+      margin-top: 6px;
+    }
+
+    button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .controls button { margin-left: 4px; }
+
+    .total-time { text-align: right; font-weight: bold; margin-top: 8px; color: var(--accent); }
+
+    @media (min-width: 768px) {
+      .container { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
-
 <body>
-  <h1>Band Practice Planner</h1>
 
-  <div class="section">
-    <h2>今日の練習メニュー</h2>
-    <ul id="menuList"></ul>
-    <button type="button" id="addMenuBtn">メニューを追加</button>
+<h1>Band Practice Scheduler</h1>
+
+<div class="container">
+  <div class="panel">
+    <h2>Practice Menu</h2>
+    <div id="menuList"></div>
   </div>
 
-  <div class="section">
-    <h2>リズム練習（細分化）</h2>
-    <ul>
-      <li>♩ = 60 / 8分刻み</li>
-      <li>♩ = 80 / 裏拍アクセント</li>
-      <li>♩ = 100 / 3連符</li>
-      <li>♩ = 120 / シンコペーション</li>
-    </ul>
+  <div class="panel">
+    <h2>Schedule</h2>
+    <div id="schedule"></div>
+    <div class="total-time" id="totalTime">合計: 0 分</div>
   </div>
+</div>
 
-  <script>
-    const menuList = document.getElementById("menuList");
-    const addMenuBtn = document.getElementById("addMenuBtn");
+<div class="panel" style="margin-top:16px">
+  <h2>Practice Details / Memo</h2>
+  <div id="details"></div>
+</div>
 
-    const addMenu = () => {
-      const text = prompt("練習メニューを入力");
-      if (!text) return;
+<script>
+const practiceMenus = [
+  { title: "リズム練習（8分）", description: "クリック使用。裏拍・シンコペ中心。" },
+  { title: "リズム練習（細分化）", description: "8分→16分→3連符→ポリリズム。" },
+  { title: "アンサンブル練習", description: "曲のセクション単位で反復。" },
+  { title: "サウンドメイク", description: "帯域整理・音量バランス調整。" },
+  { title: "通し演奏", description: "本番想定。録音推奨。" }
+];
 
-      const li = document.createElement("li");
-      li.textContent = text;
-      menuList.appendChild(li);
-    };
+const menuList = document.getElementById('menuList');
+const schedule = document.getElementById('schedule');
+const details = document.getElementById('details');
+const totalTimeEl = document.getElementById('totalTime');
 
-    // iPhone対策：click + touchstart 両対応
-    addMenuBtn.addEventListener("click", addMenu);
-    addMenuBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      addMenu();
+practiceMenus.forEach(menu => {
+  const div = document.createElement('div');
+  div.className = 'menu-item';
+  div.textContent = menu.title;
+  div.addEventListener('click', () => addToSchedule(menu));
+  menuList.appendChild(div);
+});
+
+function addToSchedule(menu) {
+  const item = document.createElement('div');
+  item.className = 'schedule-item';
+
+  const row = document.createElement('div');
+  row.className = 'row';
+
+  const title = document.createElement('span');
+  title.textContent = menu.title;
+
+  const timeInput = document.createElement('input');
+  timeInput.type = 'number';
+  timeInput.value = 15;
+  timeInput.min = 1;
+
+  const controls = document.createElement('div');
+  controls.className = 'controls';
+
+  const upBtn = document.createElement('button'); upBtn.textContent = '↑';
+  const downBtn = document.createElement('button'); downBtn.textContent = '↓';
+  const delBtn = document.createElement('button'); delBtn.textContent = '削除';
+
+  controls.append(upBtn, downBtn, delBtn);
+
+  row.append(title, timeInput, controls);
+
+  const memo = document.createElement('textarea');
+  memo.placeholder = 'メモ…';
+
+  item.append(row, memo);
+  schedule.appendChild(item);
+
+  const detail = document.createElement('div');
+  detail.className = 'menu-item';
+  detail.innerHTML = `<strong>${menu.title}</strong><br><small>${menu.description}</small>`;
+  details.appendChild(detail);
+
+  upBtn.onclick = () => { if (item.previousElementSibling) schedule.insertBefore(item, item.previousElementSibling); saveState(); };
+  downBtn.onclick = () => { if (item.nextElementSibling) schedule.insertBefore(item.nextElementSibling, item); saveState(); };
+
+  delBtn.onclick = () => { item.remove(); detail.remove(); updateTotalTime(); saveState(); };
+  timeInput.oninput = updateTotalTime;
+  memo.oninput = saveState;
+
+  updateTotalTime();
+  saveState();
+}
+
+function updateTotalTime() {
+  let total = 0;
+  document.querySelectorAll('#schedule input').forEach(i => total += Number(i.value || 0));
+  totalTimeEl.textContent = `合計: ${total} 分`;
+}
+
+function saveState() {
+  const data = [];
+  document.querySelectorAll('.schedule-item').forEach(item => {
+    data.push({
+      title: item.querySelector('span').textContent,
+      time: item.querySelector('input').value,
+      memo: item.querySelector('textarea').value
     });
+  });
+  location.hash = encodeURIComponent(JSON.stringify(data));
+}
 
-    /*
-      Service Worker は iOS事故回避のため一旦無効化
-      動作確認後に有効化するのが正解
-    */
+function loadState() {
+  if (!location.hash) return;
+  try {
+    const data = JSON.parse(decodeURIComponent(location.hash.substring(1)));
+    data.forEach(d => {
+      const menu = practiceMenus.find(m => m.title === d.title);
+      if (menu) {
+        addToSchedule(menu);
+        const last = schedule.lastElementChild;
+        last.querySelector('input').value = d.time;
+        last.querySelector('textarea').value = d.memo;
+      }
+    });
+  } catch(e) {}
+}
 
-    // if ('serviceWorker' in navigator) {
-    //   navigator.serviceWorker.register('service-worker.js');
-    // }
-  </script>
+loadState();
+</script>
+
 </body>
 </html>
