@@ -67,13 +67,23 @@ function renderMenu() {
   MENU_DATA.forEach(item => {
     const li = document.createElement("li");
     li.className = "menu-item";
+
     li.innerHTML = `
       <div class="menu-item-title">${item.name}</div>
       <div class="menu-item-details">${item.detail}</div>
       <button>追加</button>
     `;
 
-    li.querySelector("button").onclick = () => {
+    const title = li.querySelector(".menu-item-title");
+    const details = li.querySelector(".menu-item-details");
+    const button = li.querySelector("button");
+
+    title.onclick = () => {
+      details.classList.toggle("open");
+    };
+
+    button.onclick = (e) => {
+      e.stopPropagation();
       schedules[current].push({
         name: item.name,
         detail: item.detail,
@@ -98,6 +108,7 @@ function renderSchedule() {
 
     const li = document.createElement("li");
     li.className = "schedule-item";
+
     li.innerHTML = `
       <div class="schedule-item-title">${item.name}</div>
       <div class="schedule-item-controls">
@@ -116,16 +127,12 @@ function renderSchedule() {
       updateTotal();
     };
 
-    const buttons = li.querySelectorAll("button");
-    const up = buttons[0];
-    const down = buttons[1];
-    const del = buttons[2];
+    const [up, down, del] = li.querySelectorAll("button");
 
     up.onclick = () => {
       if (i > 0) {
-        const temp = schedules[current][i - 1];
-        schedules[current][i - 1] = schedules[current][i];
-        schedules[current][i] = temp;
+        [schedules[current][i - 1], schedules[current][i]] =
+        [schedules[current][i], schedules[current][i - 1]];
         save();
         renderSchedule();
       }
@@ -133,9 +140,8 @@ function renderSchedule() {
 
     down.onclick = () => {
       if (i < schedules[current].length - 1) {
-        const temp = schedules[current][i + 1];
-        schedules[current][i + 1] = schedules[current][i];
-        schedules[current][i] = temp;
+        [schedules[current][i + 1], schedules[current][i]] =
+        [schedules[current][i], schedules[current][i + 1]];
         save();
         renderSchedule();
       }
