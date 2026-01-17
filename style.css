@@ -59,9 +59,21 @@ ul {
   margin-bottom: 8px;
 }
 
+.menu-item-title {
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.menu-item-details {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #b8b8b8;
+  white-space: pre-wrap;
+  margin-bottom: 6px;
+}
+
 .menu-item button {
   width: 100%;
-  margin-top: 6px;
 }
 
 .schedule-header {

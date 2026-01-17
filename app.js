@@ -63,13 +63,16 @@ function save() {
 function renderMenu() {
   const ul = document.getElementById("menuList");
   ul.innerHTML = "";
+
   MENU_DATA.forEach(item => {
     const li = document.createElement("li");
     li.className = "menu-item";
     li.innerHTML = `
-      <div>${item.name}</div>
+      <div class="menu-item-title">${item.name}</div>
+      <div class="menu-item-details">${item.detail}</div>
       <button>追加</button>
     `;
+
     li.querySelector("button").onclick = () => {
       schedules[current].push({
         name: item.name,
@@ -79,6 +82,7 @@ function renderMenu() {
       save();
       renderSchedule();
     };
+
     ul.appendChild(li);
   });
 }
@@ -86,6 +90,7 @@ function renderMenu() {
 function renderSchedule() {
   const ul = document.getElementById("scheduleList");
   ul.innerHTML = "";
+
   let total = 0;
 
   schedules[current].forEach((item, i) => {
@@ -111,12 +116,16 @@ function renderSchedule() {
       updateTotal();
     };
 
-    const [up, down, del] = li.querySelectorAll("button");
+    const buttons = li.querySelectorAll("button");
+    const up = buttons[0];
+    const down = buttons[1];
+    const del = buttons[2];
 
     up.onclick = () => {
       if (i > 0) {
-        [schedules[current][i - 1], schedules[current][i]] =
-        [schedules[current][i], schedules[current][i - 1]];
+        const temp = schedules[current][i - 1];
+        schedules[current][i - 1] = schedules[current][i];
+        schedules[current][i] = temp;
         save();
         renderSchedule();
       }
@@ -124,8 +133,9 @@ function renderSchedule() {
 
     down.onclick = () => {
       if (i < schedules[current].length - 1) {
-        [schedules[current][i + 1], schedules[current][i]] =
-        [schedules[current][i], schedules[current][i + 1]];
+        const temp = schedules[current][i + 1];
+        schedules[current][i + 1] = schedules[current][i];
+        schedules[current][i] = temp;
         save();
         renderSchedule();
       }
