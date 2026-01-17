@@ -1,217 +1,40 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Band Practice Scheduler</title>
-
-  <style>
-    :root {
-      --bg: #111;
-      --panel: #1c1c1c;
-      --accent: #5eead4;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    h1 { font-size: 1.4rem; margin-bottom: 12px; letter-spacing: 0.05em; }
-    h2 { font-size: 1.1rem; margin-bottom: 8px; color: var(--accent); }
-
-    .container { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    .panel { background: var(--panel); border-radius: 10px; padding: 12px; }
-
-    .menu-item {
-      padding: 10px;
-      margin-bottom: 8px;
-      background: #262626;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .schedule-item {
-      background: #222;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-
-    .row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-
-    input[type="number"] {
-      width: 60px;
-      background: #111;
-      color: var(--text);
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 4px;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 60px;
-      background: #111;
-      color: var(--text);
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 6px;
-      margin-top: 6px;
-    }
-
-    button {
-      background: none;
-      border: none;
-      color: var(--accent);
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-
-    .controls button { margin-left: 4px; }
-
-    .total-time { text-align: right; font-weight: bold; margin-top: 8px; color: var(--accent); }
-
-    @media (min-width: 768px) {
-      .container { grid-template-columns: 1fr 1fr; }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>Band Practice Scheduler</h1>
+  </header>
 
-<h1>Band Practice Scheduler</h1>
+  <main>
+    <section class="menu">
+      <h2>練習メニュー</h2>
+      <ul id="menuList"></ul>
+    </section>
 
-<div class="container">
-  <div class="panel">
-    <h2>Practice Menu</h2>
-    <div id="menuList"></div>
-  </div>
+    <section class="schedule">
+      <div class="schedule-header">
+        <h2>今日のスケジュール</h2>
+        <div class="schedule-buttons">
+          <button id="newSchedule">新規</button>
+          <button id="prevSchedule">前</button>
+          <button id="nextSchedule">次</button>
+        </div>
+      </div>
 
-  <div class="panel">
-    <h2>Schedule</h2>
-    <div id="schedule"></div>
-    <div class="total-time" id="totalTime">合計: 0 分</div>
-  </div>
-</div>
+      <div class="total-time">
+        合計時間：<span id="totalTime">0</span> 分
+      </div>
 
-<div class="panel" style="margin-top:16px">
-  <h2>Practice Details / Memo</h2>
-  <div id="details"></div>
-</div>
+      <ul id="scheduleList"></ul>
+    </section>
+  </main>
 
-<script>
-const practiceMenus = [
-  { title: "リズム練習（8分）", description: "クリック使用。裏拍・シンコペ中心。" },
-  { title: "リズム練習（細分化）", description: "8分→16分→3連符→ポリリズム。" },
-  { title: "アンサンブル練習", description: "曲のセクション単位で反復。" },
-  { title: "サウンドメイク", description: "帯域整理・音量バランス調整。" },
-  { title: "通し演奏", description: "本番想定。録音推奨。" }
-];
-
-const menuList = document.getElementById('menuList');
-const schedule = document.getElementById('schedule');
-const details = document.getElementById('details');
-const totalTimeEl = document.getElementById('totalTime');
-
-practiceMenus.forEach(menu => {
-  const div = document.createElement('div');
-  div.className = 'menu-item';
-  div.textContent = menu.title;
-  div.addEventListener('click', () => addToSchedule(menu));
-  menuList.appendChild(div);
-});
-
-function addToSchedule(menu) {
-  const item = document.createElement('div');
-  item.className = 'schedule-item';
-
-  const row = document.createElement('div');
-  row.className = 'row';
-
-  const title = document.createElement('span');
-  title.textContent = menu.title;
-
-  const timeInput = document.createElement('input');
-  timeInput.type = 'number';
-  timeInput.value = 15;
-  timeInput.min = 1;
-
-  const controls = document.createElement('div');
-  controls.className = 'controls';
-
-  const upBtn = document.createElement('button'); upBtn.textContent = '↑';
-  const downBtn = document.createElement('button'); downBtn.textContent = '↓';
-  const delBtn = document.createElement('button'); delBtn.textContent = '削除';
-
-  controls.append(upBtn, downBtn, delBtn);
-
-  row.append(title, timeInput, controls);
-
-  const memo = document.createElement('textarea');
-  memo.placeholder = 'メモ…';
-
-  item.append(row, memo);
-  schedule.appendChild(item);
-
-  const detail = document.createElement('div');
-  detail.className = 'menu-item';
-  detail.innerHTML = `<strong>${menu.title}</strong><br><small>${menu.description}</small>`;
-  details.appendChild(detail);
-
-  upBtn.onclick = () => { if (item.previousElementSibling) schedule.insertBefore(item, item.previousElementSibling); saveState(); };
-  downBtn.onclick = () => { if (item.nextElementSibling) schedule.insertBefore(item.nextElementSibling, item); saveState(); };
-
-  delBtn.onclick = () => { item.remove(); detail.remove(); updateTotalTime(); saveState(); };
-  timeInput.oninput = updateTotalTime;
-  memo.oninput = saveState;
-
-  updateTotalTime();
-  saveState();
-}
-
-function updateTotalTime() {
-  let total = 0;
-  document.querySelectorAll('#schedule input').forEach(i => total += Number(i.value || 0));
-  totalTimeEl.textContent = `合計: ${total} 分`;
-}
-
-function saveState() {
-  const data = [];
-  document.querySelectorAll('.schedule-item').forEach(item => {
-    data.push({
-      title: item.querySelector('span').textContent,
-      time: item.querySelector('input').value,
-      memo: item.querySelector('textarea').value
-    });
-  });
-  location.hash = encodeURIComponent(JSON.stringify(data));
-}
-
-function loadState() {
-  if (!location.hash) return;
-  try {
-    const data = JSON.parse(decodeURIComponent(location.hash.substring(1)));
-    data.forEach(d => {
-      const menu = practiceMenus.find(m => m.title === d.title);
-      if (menu) {
-        addToSchedule(menu);
-        const last = schedule.lastElementChild;
-        last.querySelector('input').value = d.time;
-        last.querySelector('textarea').value = d.memo;
-      }
-    });
-  } catch(e) {}
-}
-
-loadState();
-</script>
-
+  <script src="app.js"></script>
 </body>
 </html>
