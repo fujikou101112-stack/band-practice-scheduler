@@ -47,6 +47,16 @@ h2 {
   letter-spacing: 0.05em;
 }
 
+.plan-switch {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.plan-switch button.active {
+  background: #3a3f55;
+}
+
 ul {
   list-style: none;
 }
@@ -80,20 +90,6 @@ ul {
 
 .menu-item button {
   width: 100%;
-}
-
-.plan-switch {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.plan-switch button {
-  flex: 1;
-}
-
-.plan-switch button.active {
-  background: #3a3f55;
 }
 
 .schedule-header {
