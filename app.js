@@ -1,16 +1,64 @@
 const MENU_DATA = [
-  { name: "帯域調整プランA", plan: "A", detail: "プランA内容" },
-  { name: "帯域調整プランB", plan: "B", detail: "プランB内容" },
-  { name: "帯域調整プランC", plan: "C", detail: "プランC内容" },
-  { name: "リズム・グルーヴ練習プランA", plan: "A", detail: "プランA内容" },
-  { name: "リズム・グルーヴ練習プランB", plan: "B", detail: "プランB内容" },
-  { name: "リズム・グルーヴ練習プランC", plan: "C", detail: "プランC内容" }
-];
+  {
+    name: "準備（セッティング）",
+    plan: "ALL",
+    detail: "・全員で機材を展開\n・チューニング\n・音量の仮合わせ\n・クリック準備"
+  },
 
-let currentPlan = "A";
+  {
+    name: "帯域調整プランA",
+    plan: "A",
+    detail: "・全員クリーン\n・ボーカル基準で音量決定\n・被る帯域を1人ずつミュートして確認"
+  },
+  {
+    name: "帯域調整プランB",
+    plan: "B",
+    detail: "・本番音量で演奏\n・1人ずつ音を足していく\n・抜けない音はEQで調整"
+  },
+  {
+    name: "帯域調整プランC",
+    plan: "C",
+    detail: "・録音しながら確認\n・再生して客観的に判断\n・不要な帯域を削る"
+  },
+
+  {
+    name: "リズム・グルーヴ練習プランA",
+    plan: "A",
+    detail: "・ドラム＋ベースのみ\n・クリックあり\n・ズレたら即停止"
+  },
+  {
+    name: "リズム・グルーヴ練習プランB",
+    plan: "B",
+    detail: "・全員参加\n・8分基準\n・裏拍を意識"
+  },
+  {
+    name: "リズム・グルーヴ練習プランC",
+    plan: "C",
+    detail: "・クリックなし\n・ドラム基準\n・走ったら戻す"
+  },
+
+  {
+    name: "曲通し",
+    plan: "ALL",
+    detail: "・止めずに通す\n・ミスしても継続\n・最後に一度だけ振り返り"
+  },
+
+  {
+    name: "休憩",
+    plan: "ALL",
+    detail: "・耳を休める\n・水分補給\n・機材触らない"
+  },
+
+  {
+    name: "片付け",
+    plan: "ALL",
+    detail: "・配線から順に撤収\n・忘れ物確認\n・次回課題を一言共有"
+  }
+];
 
 let schedules = JSON.parse(localStorage.getItem("schedules")) || [[]];
 let current = 0;
+let currentPlan = "A";
 
 function save() {
   localStorage.setItem("schedules", JSON.stringify(schedules));
@@ -21,7 +69,7 @@ function renderMenu() {
   ul.innerHTML = "";
 
   MENU_DATA
-    .filter(item => item.plan === currentPlan)
+    .filter(item => item.plan === currentPlan || item.plan === "ALL")
     .forEach(item => {
       const li = document.createElement("li");
       li.className = "menu-item";
@@ -125,18 +173,6 @@ function updateTotal() {
   document.getElementById("totalTime").textContent = total;
 }
 
-/* プラン切り替え */
-document.querySelectorAll(".plan-switch button").forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll(".plan-switch button")
-      .forEach(b => b.classList.remove("active"));
-
-    btn.classList.add("active");
-    currentPlan = btn.dataset.plan;
-    renderMenu();
-  };
-});
-
 document.getElementById("newSchedule").onclick = () => {
   schedules.push([]);
   current = schedules.length - 1;
@@ -157,6 +193,17 @@ document.getElementById("nextSchedule").onclick = () => {
     renderSchedule();
   }
 };
+
+document.querySelectorAll(".plan-switch button").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".plan-switch button")
+      .forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
+    currentPlan = btn.dataset.plan;
+    renderMenu();
+  };
+});
 
 renderMenu();
 renderSchedule();
