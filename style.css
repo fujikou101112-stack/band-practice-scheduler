@@ -82,20 +82,6 @@ ul {
   width: 100%;
 }
 
-.plan-switch {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.plan-switch button {
-  flex: 1;
-}
-
-.plan-switch button.active {
-  background: #3a3f55;
-}
-
 .schedule-header {
   display: flex;
   justify-content: space-between;
@@ -147,4 +133,10 @@ button {
 
 button:active {
   background: #2c3142;
+}
+
+.plan-buttons {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
 }

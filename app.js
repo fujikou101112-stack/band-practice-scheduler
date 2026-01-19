@@ -1,60 +1,26 @@
-const MENU_DATA = [
-  {
-    name: "準備（セッティング）",
-    plan: "ALL",
-    detail: "・全員で機材を展開\n・チューニング\n・音量の仮合わせ\n・クリック準備"
-  },
-
-  {
-    name: "帯域調整プランA",
-    plan: "A",
-    detail: "・全員クリーン\n・ボーカル基準で音量決定\n・被る帯域を1人ずつミュートして確認"
-  },
-  {
-    name: "帯域調整プランB",
-    plan: "B",
-    detail: "・本番音量で演奏\n・1人ずつ音を足していく\n・抜けない音はEQで調整"
-  },
-  {
-    name: "帯域調整プランC",
-    plan: "C",
-    detail: "・録音しながら確認\n・再生して客観的に判断\n・不要な帯域を削る"
-  },
-
-  {
-    name: "リズム・グルーヴ練習プランA",
-    plan: "A",
-    detail: "・ドラム＋ベースのみ\n・クリックあり\n・ズレたら即停止"
-  },
-  {
-    name: "リズム・グルーヴ練習プランB",
-    plan: "B",
-    detail: "・全員参加\n・8分基準\n・裏拍を意識"
-  },
-  {
-    name: "リズム・グルーヴ練習プランC",
-    plan: "C",
-    detail: "・クリックなし\n・ドラム基準\n・走ったら戻す"
-  },
-
-  {
-    name: "曲通し",
-    plan: "ALL",
-    detail: "・止めずに通す\n・ミスしても継続\n・最後に一度だけ振り返り"
-  },
-
-  {
-    name: "休憩",
-    plan: "ALL",
-    detail: "・耳を休める\n・水分補給\n・機材触らない"
-  },
-
-  {
-    name: "片付け",
-    plan: "ALL",
-    detail: "・配線から順に撤収\n・忘れ物確認\n・次回課題を一言共有"
-  }
-];
+const MENU_DATA = {
+  A: [
+    { name: "準備（セッティング）", detail: "・全員で機材を展開\n・チューニング\n・音量の仮合わせ\n・クリック準備" },
+    { name: "帯域調整プランA", detail: "・クリーン音でボーカル基準\n・他楽器との干渉チェック\n・被っていたらEQ調整" },
+    { name: "リズム・グルーヴ練習プランA", detail: "・ベースルート基準\n・ドラムとギターでテンポ確認\n・ズレたら即停止し修正" },
+    { name: "休憩", detail: "・耳を休める\n・水分補給\n・機材触らない" },
+    { name: "片付け", detail: "・配線から順に撤収\n・忘れ物確認\n・次回課題を一言共有" }
+  ],
+  B: [
+    { name: "準備（セッティング）", detail: "・全員で機材を展開\n・チューニング\n・音量の仮合わせ\n・クリック準備" },
+    { name: "帯域調整プランB", detail: "・全員クリーンで演奏\n・個別EQ確認\n・ハモリと主旋律バランス調整" },
+    { name: "リズム・グルーヴ練習プランB", detail: "・A/Bメロを分解して反復\n・リズムキープ優先\n・タイミングずれは録音で確認" },
+    { name: "休憩", detail: "・耳を休める\n・水分補給\n・機材触らない" },
+    { name: "片付け", detail: "・配線から順に撤収\n・忘れ物確認\n・次回課題を一言共有" }
+  ],
+  C: [
+    { name: "準備（セッティング）", detail: "・全員で機材を展開\n・チューニング\n・音量の仮合わせ\n・クリック準備" },
+    { name: "帯域調整プランC", detail: "・本番音量で演奏\n・歌いながらバランス調整\n・前に出す/引くを意識" },
+    { name: "リズム・グルーヴ練習プランC", detail: "・曲通しをテンポ固定で\n・リズム乱れ箇所は個別リピート\n・最終確認後録音" },
+    { name: "休憩", detail: "・耳を休める\n・水分補給\n・機材触らない" },
+    { name: "片付け", detail: "・配線から順に撤収\n・忘れ物確認\n・次回課題を一言共有" }
+  ]
+};
 
 let schedules = JSON.parse(localStorage.getItem("schedules")) || [[]];
 let current = 0;
@@ -68,39 +34,33 @@ function renderMenu() {
   const ul = document.getElementById("menuList");
   ul.innerHTML = "";
 
-  MENU_DATA
-    .filter(item => item.plan === currentPlan || item.plan === "ALL")
-    .forEach(item => {
-      const li = document.createElement("li");
-      li.className = "menu-item";
+  MENU_DATA[currentPlan].forEach(item => {
+    const li = document.createElement("li");
+    li.className = "menu-item";
 
-      li.innerHTML = `
-        <div class="menu-item-title">${item.name}</div>
-        <div class="menu-item-details">${item.detail}</div>
-        <button>追加</button>
-      `;
+    li.innerHTML = `
+      <div class="menu-item-title">${item.name}</div>
+      <div class="menu-item-details">${item.detail}</div>
+      <button>追加</button>
+    `;
 
-      const title = li.querySelector(".menu-item-title");
-      const details = li.querySelector(".menu-item-details");
-      const button = li.querySelector("button");
+    const title = li.querySelector(".menu-item-title");
+    const details = li.querySelector(".menu-item-details");
+    const button = li.querySelector("button");
 
-      title.onclick = () => {
-        details.classList.toggle("open");
-      };
+    title.onclick = () => {
+      details.classList.toggle("open");
+    };
 
-      button.onclick = (e) => {
-        e.stopPropagation();
-        schedules[current].push({
-          name: item.name,
-          detail: item.detail,
-          time: 10
-        });
-        save();
-        renderSchedule();
-      };
+    button.onclick = (e) => {
+      e.stopPropagation();
+      schedules[current].push({ name: item.name, detail: item.detail, time: 10 });
+      save();
+      renderSchedule();
+    };
 
-      ul.appendChild(li);
-    });
+    ul.appendChild(li);
+  });
 }
 
 function renderSchedule() {
@@ -194,16 +154,9 @@ document.getElementById("nextSchedule").onclick = () => {
   }
 };
 
-document.querySelectorAll(".plan-switch button").forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll(".plan-switch button")
-      .forEach(b => b.classList.remove("active"));
-
-    btn.classList.add("active");
-    currentPlan = btn.dataset.plan;
-    renderMenu();
-  };
-});
+document.getElementById("planA").onclick = () => { currentPlan = "A"; renderMenu(); };
+document.getElementById("planB").onclick = () => { currentPlan = "B"; renderMenu(); };
+document.getElementById("planC").onclick = () => { currentPlan = "C"; renderMenu(); };
 
 renderMenu();
 renderSchedule();
