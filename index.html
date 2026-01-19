@@ -3,73 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <title>Practice Menu</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      margin: 0;
-      padding: 16px;
-      background: #0f0f0f;
-      color: #eaeaea;
-    }
-
-    h1 {
-      font-size: 18px;
-      margin-bottom: 12px;
-    }
-
-    .plan-switcher {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .plan-switcher button {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #333;
-      background: #1a1a1a;
-      color: #eaeaea;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .plan-switcher button.active {
-      background: #3b82f6;
-      border-color: #3b82f6;
-      color: #fff;
-    }
-
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .menu-item {
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 12px;
-      background: #151515;
-    }
-
-    .menu-item h2 {
-      font-size: 15px;
-      margin: 0 0 8px 0;
-    }
-
-    .menu-item ul {
-      margin: 0;
-      padding-left: 18px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>基礎練メニュー</h1>
 
-  <!-- プラン切り替えボタン（常に表示） -->
+  <!-- プラン切り替えボタン（帯域チェック・リズム・グルーヴ練習のみ切替） -->
   <div class="plan-switcher">
     <button id="btnA">A</button>
     <button id="btnB" class="active">B</button>
@@ -79,117 +18,18 @@
   <!-- メニュー -->
   <div id="menu" class="menu"></div>
 
-  <script>
-    const plans = {
-      A: [
-        {
-          title: "帯域認識：低域",
-          steps: [
-            "単音をクリーンで演奏",
-            "EQで100Hz〜250Hzをブースト",
-            "音程の輪郭と濁りを確認"
-          ],
-          actions: [
-            "低域が膨らみすぎたらゲインを下げる",
-            "ピッキング位置をブリッジ寄りに調整"
-          ]
-        }
-      ],
-      B: [
-        {
-          title: "帯域認識：中域",
-          steps: [
-            "単音を軽く歪ませて演奏",
-            "EQで800Hz〜1.6kHzをブースト",
-            "音の前に出方を確認"
-          ],
-          actions: [
-            "耳に痛ければ1kHz付近を微調整",
-            "ミュート精度を上げる"
-          ]
-        },
-        {
-          title: "帯域コントロール：ボーカル回避",
-          steps: [
-            "バッキングフレーズを演奏",
-            "2kHz〜3kHzを軽くカット",
-            "ボーカル帯域との分離を確認"
-          ],
-          actions: [
-            "存在感が消えたら歪み量で補正",
-            "コードボイシングを整理"
-          ]
-        }
-      ],
-      C: [
-        {
-          title: "帯域認識：高域",
-          steps: [
-            "アルペジオを演奏",
-            "EQで4kHz〜6kHzをブースト",
-            "アタックとノイズ感を確認"
-          ],
-          actions: [
-            "耳障りならピック角度を調整",
-            "不要な弦ノイズをミュート"
-          ]
-        }
-      ]
-    };
+  <!-- スケジュール -->
+  <div id="scheduleContainer">
+    <h2>今日のスケジュール</h2>
+    <div class="schedule-controls">
+      <button id="newSchedule">新規</button>
+      <button id="prevSchedule">前</button>
+      <button id="nextSchedule">次</button>
+    </div>
+    <div class="total-time">合計時間：<span id="totalTime">0</span> 分</div>
+    <ul id="scheduleList"></ul>
+  </div>
 
-    let currentPlan = "B";
-
-    const menuEl = document.getElementById("menu");
-    const btnA = document.getElementById("btnA");
-    const btnB = document.getElementById("btnB");
-    const btnC = document.getElementById("btnC");
-
-    function renderMenu(planKey) {
-      menuEl.innerHTML = "";
-      plans[planKey].forEach(item => {
-        const div = document.createElement("div");
-        div.className = "menu-item";
-
-        div.innerHTML = `
-          <h2>${item.title}</h2>
-          <ul>
-            ${item.steps.map(s => `<li>${s}</li>`).join("")}
-          </ul>
-          <ul>
-            ${item.actions.map(a => `<li>${a}</li>`).join("")}
-          </ul>
-        `;
-        menuEl.appendChild(div);
-      });
-    }
-
-    function setActiveButton(planKey) {
-      [btnA, btnB, btnC].forEach(btn => btn.classList.remove("active"));
-      if (planKey === "A") btnA.classList.add("active");
-      if (planKey === "B") btnB.classList.add("active");
-      if (planKey === "C") btnC.classList.add("active");
-    }
-
-    btnA.onclick = () => {
-      currentPlan = "A";
-      setActiveButton("A");
-      renderMenu("A");
-    };
-
-    btnB.onclick = () => {
-      currentPlan = "B";
-      setActiveButton("B");
-      renderMenu("B");
-    };
-
-    btnC.onclick = () => {
-      currentPlan = "C";
-      setActiveButton("C");
-      renderMenu("C");
-    };
-
-    // 初期表示（B）
-    renderMenu(currentPlan);
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>

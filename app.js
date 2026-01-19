@@ -24,139 +24,53 @@ const MENU_DATA = {
 
 let schedules = JSON.parse(localStorage.getItem("schedules")) || [[]];
 let current = 0;
-let currentPlan = "A";
+let currentPlan = "B";
+
+const menuEl = document.getElementById("menu");
+const btnA = document.getElementById("btnA");
+const btnB = document.getElementById("btnB");
+const btnC = document.getElementById("btnC");
 
 function save() {
   localStorage.setItem("schedules", JSON.stringify(schedules));
 }
 
 function renderMenu() {
-  const ul = document.getElementById("menuList");
-  ul.innerHTML = "";
+  menuEl.innerHTML = "";
+  // 準備・休憩・片付けは常に表示
+  const fixedItems = ["準備（セッティング）", "休憩", "片付け"];
+  fixedItems.forEach(name => {
+    const item = MENU_DATA["A"].find(i => i.name === name);
+    appendMenuItem(item);
+  });
 
-  MENU_DATA[currentPlan].forEach(item => {
-    const li = document.createElement("li");
-    li.className = "menu-item";
-
-    li.innerHTML = `
-      <div class="menu-item-title">${item.name}</div>
-      <div class="menu-item-details">${item.detail}</div>
-      <button>追加</button>
-    `;
-
-    const title = li.querySelector(".menu-item-title");
-    const details = li.querySelector(".menu-item-details");
-    const button = li.querySelector("button");
-
-    title.onclick = () => {
-      details.classList.toggle("open");
-    };
-
-    button.onclick = (e) => {
-      e.stopPropagation();
-      schedules[current].push({ name: item.name, detail: item.detail, time: 10 });
-      save();
-      renderSchedule();
-    };
-
-    ul.appendChild(li);
+  // 帯域調整とリズム練習はプラン切替
+  ["帯域調整", "リズム・グルーヴ練習"].forEach(prefix => {
+    const item = MENU_DATA[currentPlan].find(i => i.name.startsWith(prefix));
+    appendMenuItem(item);
   });
 }
 
-function renderSchedule() {
-  const ul = document.getElementById("scheduleList");
-  ul.innerHTML = "";
-
-  let total = 0;
-
-  schedules[current].forEach((item, i) => {
-    total += Number(item.time) || 0;
-
-    const li = document.createElement("li");
-    li.className = "schedule-item";
-
-    li.innerHTML = `
-      <div class="schedule-item-title">${item.name}</div>
-      <div class="schedule-item-controls">
-        <input type="number" min="0" value="${item.time}">
-        <button>↑</button>
-        <button>↓</button>
-        <button>削除</button>
-      </div>
-      <div class="schedule-item-details">${item.detail}</div>
-    `;
-
-    const input = li.querySelector("input");
-    input.oninput = () => {
-      item.time = input.value;
-      save();
-      updateTotal();
-    };
-
-    const [up, down, del] = li.querySelectorAll("button");
-
-    up.onclick = () => {
-      if (i > 0) {
-        [schedules[current][i - 1], schedules[current][i]] =
-        [schedules[current][i], schedules[current][i - 1]];
-        save();
-        renderSchedule();
-      }
-    };
-
-    down.onclick = () => {
-      if (i < schedules[current].length - 1) {
-        [schedules[current][i + 1], schedules[current][i]] =
-        [schedules[current][i], schedules[current][i + 1]];
-        save();
-        renderSchedule();
-      }
-    };
-
-    del.onclick = () => {
-      schedules[current].splice(i, 1);
-      save();
-      renderSchedule();
-    };
-
-    ul.appendChild(li);
-  });
-
-  document.getElementById("totalTime").textContent = total;
+function appendMenuItem(item) {
+  const div = document.createElement("div");
+  div.className = "menu-item";
+  div.innerHTML = `
+    <h2>${item.name}</h2>
+    <ul>${item.detail.split("\n").map(s => `<li>${s}</li>`).join("")}</ul>
+  `;
+  menuEl.appendChild(div);
 }
 
-function updateTotal() {
-  const total = schedules[current].reduce(
-    (sum, item) => sum + Number(item.time || 0),
-    0
-  );
-  document.getElementById("totalTime").textContent = total;
+function setActiveButton(planKey) {
+  [btnA, btnB, btnC].forEach(btn => btn.classList.remove("active"));
+  if (planKey === "A") btnA.classList.add("active");
+  if (planKey === "B") btnB.classList.add("active");
+  if (planKey === "C") btnC.classList.add("active");
 }
 
-document.getElementById("newSchedule").onclick = () => {
-  schedules.push([]);
-  current = schedules.length - 1;
-  save();
-  renderSchedule();
-};
+btnA.onclick = () => { currentPlan = "A"; setActiveButton("A"); renderMenu(); };
+btnB.onclick = () => { currentPlan = "B"; setActiveButton("B"); renderMenu(); };
+btnC.onclick = () => { currentPlan = "C"; setActiveButton("C"); renderMenu(); };
 
-document.getElementById("prevSchedule").onclick = () => {
-  if (current > 0) {
-    current--;
-    renderSchedule();
-  }
-};
-
-document.getElementById("nextSchedule").onclick = () => {
-  if (current < schedules.length - 1) {
-    current++;
-    renderSchedule();
-  }
-};
-
-document.getElementById("planA").onclick = () => { currentPlan = "A"; renderMenu(); };
-document.getElementById("planB").onclick = () => { currentPlan = "B"; renderMenu(); };
-document.getElementById("planC").onclick = () => { currentPlan = "C"; renderMenu(); };
-
+// 初期表示
 renderMenu();
-renderSchedule();

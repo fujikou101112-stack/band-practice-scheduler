@@ -8,93 +8,91 @@
 body {
   background: #0f1115;
   color: #e5e5e5;
-}
-
-header {
-  text-align: center;
-  padding: 12px;
-  border-bottom: 1px solid #222;
+  padding: 16px;
 }
 
 h1 {
   font-size: 18px;
-  letter-spacing: 0.08em;
+  margin-bottom: 12px;
 }
 
-main {
+.plan-switcher {
   display: flex;
-  height: calc(100vh - 52px);
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-.menu,
-.schedule {
-  padding: 12px;
-  overflow-y: auto;
+.plan-switcher button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #1a1a1a;
+  color: #eaeaea;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.plan-switcher button.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
 }
 
 .menu {
-  width: 40%;
-  border-right: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
-.schedule {
-  width: 60%;
+.menu-item {
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 12px;
+  background: #151515;
 }
 
-h2 {
-  font-size: 14px;
+.menu-item h2 {
+  font-size: 15px;
   margin-bottom: 8px;
-  letter-spacing: 0.05em;
 }
 
-ul {
-  list-style: none;
+.menu-item ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
-.menu-item,
+#scheduleContainer {
+  margin-top: 16px;
+}
+
+.schedule-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.schedule-controls button {
+  background: #222733;
+  color: #e5e5e5;
+  border: 1px solid #333;
+  padding: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.schedule-controls button:active {
+  background: #2c3142;
+}
+
 .schedule-item {
   background: #181b22;
   border: 1px solid #262a34;
   padding: 10px;
   margin-bottom: 8px;
-}
-
-.menu-item-title {
-  font-size: 13px;
-  margin-bottom: 6px;
-  cursor: pointer;
-}
-
-.menu-item-details {
-  font-size: 12px;
-  line-height: 1.5;
-  color: #b8b8b8;
-  white-space: pre-wrap;
-  margin-bottom: 6px;
-  display: none;
-}
-
-.menu-item-details.open {
-  display: block;
-}
-
-.menu-item button {
-  width: 100%;
-}
-
-.schedule-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.schedule-buttons button {
-  margin-left: 4px;
-}
-
-.total-time {
-  margin: 8px 0;
-  font-size: 13px;
 }
 
 .schedule-item-title {
@@ -121,22 +119,4 @@ ul {
   line-height: 1.5;
   color: #b8b8b8;
   white-space: pre-wrap;
-}
-
-button {
-  background: #222733;
-  color: #e5e5e5;
-  border: 1px solid #333;
-  padding: 6px;
-  font-size: 12px;
-}
-
-button:active {
-  background: #2c3142;
-}
-
-.plan-buttons {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 8px;
 }
